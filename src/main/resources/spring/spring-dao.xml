@@ -23,7 +23,7 @@
     </bean>
     <!--3.配置SQLSessionFactory-->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <!--1.注入数据库连接池-->
+        <!--1.注入数据库连接池 这里name为引用类型,使用ref指针-->
         <property name="dataSource" ref="dataSource"/>
         <!--2.mybatis全局配置-->
         <property name="configLocation" value="classpath:mybatis-config.xml"/>
@@ -34,7 +34,7 @@
     </bean>
     <!--4.配置扫描dao层接口,动态实现dao接口,作为bean注入到spring-->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <!--注入sqlSessionFactory-->
+        <!--注入sqlSessionFactory 这里name为String类型,因此使用value属性-->
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
         <!--扫描dao-->
         <property name="basePackage" value="com.mello.dao"/>

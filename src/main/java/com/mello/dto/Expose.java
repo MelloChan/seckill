@@ -18,13 +18,18 @@ public class Expose {
     //秒杀结束时间
     private long end;
 
+    public Expose(boolean exposed, long seckillId) {
+        this.exposed = exposed;
+        this.seckillId = seckillId;
+    }
+
     public Expose(boolean exposed, String md5, long seckillId) {
         this.exposed = exposed;
         this.md5 = md5;
         this.seckillId = seckillId;
     }
 
-    public Expose(boolean exposed, String md5, long seckillId, long now, long start, long end) {
+    public Expose(boolean exposed, long seckillId, long now, long start, long end) {
         this.exposed = exposed;
         this.md5 = md5;
         this.seckillId = seckillId;
