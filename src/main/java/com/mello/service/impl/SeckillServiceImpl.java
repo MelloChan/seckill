@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -90,9 +91,11 @@ public class SeckillServiceImpl implements SeckillService {
      * @throws SeckillCloseExpection 秒杀关闭异常
      */
     @Override
+    @Transactional
     public SeckillExecution executeSeckill(long seckillId, long userPhone, String md5) throws SeckillExpection{
 
-        if (md5 == null || DigestUtils.getMD5(seckillId + "/" + SLAT).equals(md5)) {
+        if (md5 == null || !DigestUtils.getMD5(seckillId + "/" + SLAT).equals(md5)) {
+            LOG.info("md5:"+md5);
             throw new SeckillExpection("secKill data rewrite"); //秒杀数据被重写
         }
         try {

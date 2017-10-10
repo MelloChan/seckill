@@ -23,6 +23,8 @@ VALUES ('1000元秒杀iPhone8',100,'2017-11-11 00:00:00','2017-11-12 00:00:00'),
 ('500元秒杀小米6',300,'2017-11-11 00:00:00','2017-11-12 00:00:00'),
 ('300元秒杀小米5',400,'2017-11-11 00:00:00','2017-11-12 00:00:00'),
 ('100元秒杀红米note',500,'2017-11-11 00:00:00','2017-11-12 00:00:00');
+INSERT INTO seckill(name, number, start_time, end_time) VALUES
+  ('demo',2,'2017-10-09 00:00:00','2017-11-11 00:00:00');
 
 -- 秒杀成功明细表
 -- 用户登录认证相关信息
@@ -36,3 +38,4 @@ KEY idx_create_time(create_time)
 )ENGINE=InnoDB DEFAULT charset=utf8 comment='秒杀成功明细表';
 
 SELECT * FROM seckill;
+SELECT * FROM success_seckill;
