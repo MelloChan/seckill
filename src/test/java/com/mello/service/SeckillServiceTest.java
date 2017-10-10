@@ -1,5 +1,8 @@
 package com.mello.service;
 
+import com.mello.dto.Expose;
+import com.mello.dto.SeckillExecution;
+import com.mello.utils.DigestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -16,34 +19,50 @@ import static org.junit.Assert.*;
  * Created by MelloChan on 2017/10/10.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:spring/spring-dao.xml","classpath:spring/spring-service.xml"})
+@ContextConfiguration({"classpath:spring/spring-dao.xml", "classpath:spring/spring-service.xml"})
 public class SeckillServiceTest {
-    private final Logger LOG= LoggerFactory.getLogger(this.getClass());
+    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
     @Resource
     private SeckillService seckillService;
+
     @Test
     public void getSeckillList() throws Exception {
-        LOG.info(seckillService.getSeckillList().toString());
+        LOG.info("list={}", seckillService.getSeckillList());
     }
 
     @Test
     public void getById() throws Exception {
-        long id=1000;
-        LOG.info(seckillService.getById(id).toString());
+        long id = 1000;
+        LOG.info("seckill={}", seckillService.getById(id));
     }
 
     @Test
     public void exportSeckillUrl() throws Exception {
-        long id=1001;
-        LOG.info(seckillService.exportSeckillUrl(id).toString());
+        long id = 1001;
+        LOG.info("expose={}",seckillService.exportSeckillUrl(id));
     }
 
     @Test
     public void executeSeckill() throws Exception {
-        long id1=1005;
-        long usePhone=13192265851L;
-        String md5=seckillService.exportSeckillUrl(id1).getMd5();
-        LOG.info(seckillService.executeSeckill(id1,usePhone,md5).toString());
+        long id1 = 1005;
+        long usePhone = 13192265851L;
+        String md5 = seckillService.exportSeckillUrl(id1).getMd5();
+        LOG.info("result={}",seckillService.executeSeckill(id1, usePhone, md5));
+    }
+
+    @Test
+    public void secKillLogic() throws Exception {
+        long id = 1005;
+        Expose expose = seckillService.exportSeckillUrl(id);
+        if (expose.isExposed()) {
+            LOG.info("expose={}", expose);
+            long usePhone = 13192265851L;
+            String md5 = expose.getMd5();
+            SeckillExecution seckillExecution = seckillService.executeSeckill(id, usePhone, md5);
+            LOG.info("result={}", seckillExecution);
+        } else {
+            LOG.warn("expose={}", expose);
+        }
     }
 
 }
