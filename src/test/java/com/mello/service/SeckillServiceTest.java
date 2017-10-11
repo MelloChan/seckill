@@ -52,7 +52,7 @@ public class SeckillServiceTest {
 
     @Test
     public void secKillLogic() throws Exception {
-        long id = 1005;
+        long id = 1002;
         Expose expose = seckillService.exportSeckillUrl(id);
         if (expose.isExposed()) {
             LOG.info("expose={}", expose);
