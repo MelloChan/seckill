@@ -4,6 +4,9 @@ import com.mello.domain.Seckill;
 import com.mello.dto.Expose;
 import com.mello.dto.SeckillExecution;
 import com.mello.dto.SeckillResult;
+import com.mello.enums.SeckillStateEnum;
+import com.mello.expection.RepeatSeckillExpection;
+import com.mello.expection.SeckillCloseExpection;
 import com.mello.service.SeckillService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,46 +54,58 @@ public class SeckillController {
         return "detail";
     }
 
-    //ajax 接口 返回json
-    @PostMapping(value = "/{seckillId}/expose",produces = {"application/json;charset=UTF-8"})
+    /**
+     * 暴露秒杀接口 json格式
+     *
+     * @param seckillId
+     * @return
+     */
+    @PostMapping(value = "/{seckillId}/expose", produces = {"application/json;charset=UTF-8"})
     @ResponseBody
-    public SeckillResult<Expose> export(Long seckillId) {
+    public SeckillResult<Expose> export(@PathVariable("seckillId") Long seckillId) {
         SeckillResult<Expose> result;
         try {
             Expose expose = seckillService.exportSeckillUrl(seckillId);
-            result = new SeckillResult<Expose>(true, expose);
+            result = new SeckillResult<>(true, expose);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
-            result = new SeckillResult<Expose>(false, e.getMessage());
+            result = new SeckillResult<>(false, e.getMessage());
         }
         return result;
     }
 
-    @PostMapping(value = "/{seckillId}/{md5}/execution",produces = {"application/json;charset=UTF-8"})
-    public SeckillResult<SeckillExecution>execute(@PathVariable("seckillId") Long seckillId,@PathVariable("md5") String md5,
-                                                  @CookieValue(value = "killPhone",required = false) Long phone){
-       //springmvc valid 此处较为简单不需要使用
-        if(phone==null){
-           return new SeckillResult<SeckillExecution>(false,"未注册");
-       }
-        SeckillResult<SeckillExecution>result;
+    @PostMapping(value = "/{seckillId}/{md5}/execution", produces = {"application/json;charset=UTF-8"})
+    public SeckillResult<SeckillExecution> execute(@PathVariable("seckillId") Long seckillId, @PathVariable("md5") String md5,
+                                                   @CookieValue(value = "userPhone", required = false) Long userPhone) {
+        //springmvc valid 此处较为简单不需要使用
+        if (userPhone == null) {
+            return new SeckillResult<>(false, "未注册");
+        }
+        SeckillResult<SeckillExecution> result;
         try {
-            SeckillExecution execution=seckillService.executeSeckill(seckillId,phone,md5);
-            result=new SeckillResult<SeckillExecution>(true,execution);
+            SeckillExecution execution = seckillService.executeSeckill(seckillId, userPhone, md5);
+            result = new SeckillResult<>(false, execution);
+        } catch (RepeatSeckillExpection e1) {
+            SeckillExecution execution = new SeckillExecution(seckillId, SeckillStateEnum.REPEAT_KILL);
+            return new SeckillResult<>(false, execution);
+        } catch (SeckillCloseExpection e2) {
+            SeckillExecution execution = new SeckillExecution(seckillId, SeckillStateEnum.END);
+            return new SeckillResult<>(false, execution);
         } catch (Exception e) {
-            LOG.error(e.getMessage(),e);
-            result=new SeckillResult<SeckillExecution>(false,e.getMessage());
+            SeckillExecution execution = new SeckillExecution(seckillId, SeckillStateEnum.INNER_ERROR);
+            result = new SeckillResult<>(false, execution);
         }
         return result;
     }
 
     /**
      * 获取系统时间
+     *
      * @return json结果集
      */
-    @GetMapping(value = "/time/now",produces = {"application/json;charset=UTF-8"})
+    @GetMapping(value = "/time/now", produces = {"application/json;charset=UTF-8"})
     @ResponseBody
-    public SeckillResult<Long>time(){
-        return new SeckillResult<Long>(true,new Date().getTime());
+    public SeckillResult<Long> time() {
+        return new SeckillResult<>(true, new Date().getTime());
     }
 }
