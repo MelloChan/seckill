@@ -39,3 +39,6 @@ KEY idx_create_time(create_time)
 
 SELECT * FROM seckill;
 SELECT * FROM success_seckill;
+DROP TABLE success_seckill;
+DELETE FROM success_seckill WHERE seckill_id=1005;
+UPDATE seckill SET seckill.seckill.number=100 WHERE seckill.seckill.seckill_id=1005

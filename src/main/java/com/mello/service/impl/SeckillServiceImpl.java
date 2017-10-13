@@ -113,6 +113,7 @@ public class SeckillServiceImpl implements SeckillService {
                 } else {
                     // 秒杀成功 得到成功插入的数据 并返回成功秒杀的对象信息
                     SuccessKilled successKilled = successKilledDao.queryByIdWithSeckill(seckillId, userPhone);
+                    LOG.debug("successKilled={}",successKilled);
                     return new SeckillExecution(seckillId, SeckillStateEnum.SUCCESS, successKilled);
                 }
             }

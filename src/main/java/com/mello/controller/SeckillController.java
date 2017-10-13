@@ -60,7 +60,7 @@ public class SeckillController {
      * @param seckillId
      * @return
      */
-    @PostMapping(value = "/{seckillId}/expose", produces = {"application/json;charset=UTF-8"})
+    @GetMapping(value = "/{seckillId}/expose", produces = {"application/json;charset=UTF-8"})
     @ResponseBody
     public SeckillResult<Expose> export(@PathVariable("seckillId") Long seckillId) {
         SeckillResult<Expose> result;
@@ -75,9 +75,10 @@ public class SeckillController {
     }
 
     @PostMapping(value = "/{seckillId}/{md5}/execution", produces = {"application/json;charset=UTF-8"})
+    @ResponseBody
     public SeckillResult<SeckillExecution> execute(@PathVariable("seckillId") Long seckillId, @PathVariable("md5") String md5,
                                                    @CookieValue(value = "userPhone", required = false) Long userPhone) {
-        //springmvc valid 此处较为简单不需要使用
+        //没使用springmvc valid 参数较少
         if (userPhone == null) {
             return new SeckillResult<>(false, "未注册");
         }
@@ -95,6 +96,7 @@ public class SeckillController {
             SeckillExecution execution = new SeckillExecution(seckillId, SeckillStateEnum.INNER_ERROR);
             result = new SeckillResult<>(false, execution);
         }
+        LOG.debug("result={}", result);
         return result;
     }
 
@@ -103,9 +105,10 @@ public class SeckillController {
      *
      * @return json结果集
      */
-    @GetMapping(value = "/time/now", produces = {"application/json;charset=UTF-8"})
+    @GetMapping(value = "/time/now")
     @ResponseBody
     public SeckillResult<Long> time() {
-        return new SeckillResult<>(true, new Date().getTime());
+        Date now = new Date();
+        return new SeckillResult<>(true, now.getTime());
     }
 }

@@ -15,7 +15,7 @@ public class SeckillExecution {
     private String stateInfo;
     //秒杀成功对象记录
     private SuccessKilled successKilled;
-
+    public SeckillExecution(){}
     public SeckillExecution(long seckillId, SeckillStateEnum seckillStateEnum, SuccessKilled successKilled) {
         this.seckillId = seckillId;
         this.state = seckillStateEnum.getState();
