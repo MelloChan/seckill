@@ -2,6 +2,7 @@ package com.mello.service.impl;
 
 import com.mello.dao.SecKillDao;
 import com.mello.dao.SuccessKilledDao;
+import com.mello.dao.cache.RedisDao;
 import com.mello.domain.Seckill;
 import com.mello.domain.SuccessKilled;
 import com.mello.dto.Expose;
@@ -30,12 +31,14 @@ public class SeckillServiceImpl implements SeckillService {
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
     private final SecKillDao secKillDao;
     private final SuccessKilledDao successKilledDao;
+    private final RedisDao redisDao;
     private final static String SLAT = "sdasdadasd54$5646)(2opkopSQE.";
 
     @Autowired
-    public SeckillServiceImpl(SecKillDao secKillDao, SuccessKilledDao successKilledDao) {
+    public SeckillServiceImpl(SecKillDao secKillDao, SuccessKilledDao successKilledDao, RedisDao redisDao) {
         this.secKillDao = secKillDao;
         this.successKilledDao = successKilledDao;
+        this.redisDao = redisDao;
     }
 
     /**
@@ -67,9 +70,14 @@ public class SeckillServiceImpl implements SeckillService {
      */
     @Override
     public Expose exportSeckillUrl(long seckillId) {
-        Seckill seckill = getById(seckillId);
+        Seckill seckill = redisDao.getSeckill(seckillId);
         if (seckill == null) {
-            return new Expose(false, seckillId);
+            seckill = secKillDao.queryById(seckillId);
+            if (seckill == null) {
+                return new Expose(false, seckillId);
+            }else{
+                redisDao.putSeckill(seckill);
+            }
         }
         long nowTime = new Date().getTime();
         if (nowTime < seckill.getStartTime().getTime() || nowTime > seckill.getEndTime().getTime()) {
@@ -84,18 +92,18 @@ public class SeckillServiceImpl implements SeckillService {
      *
      * @param seckillId 秒杀商品id
      * @param userPhone 用户手机
-     * @param md5 加密的秒杀接口
+     * @param md5       加密的秒杀接口
      * @return 秒杀执行结果
-     * @throws SeckillExpection 秒杀运行时异常
+     * @throws SeckillExpection       秒杀运行时异常
      * @throws RepeatSeckillExpection 重复秒杀异常
-     * @throws SeckillCloseExpection 秒杀关闭异常
+     * @throws SeckillCloseExpection  秒杀关闭异常
      */
     @Override
     @Transactional
-    public SeckillExecution executeSeckill(long seckillId, long userPhone, String md5) throws SeckillExpection{
+    public SeckillExecution executeSeckill(long seckillId, long userPhone, String md5) throws SeckillExpection {
 
         if (md5 == null || !DigestUtils.getMD5(seckillId + "/" + SLAT).equals(md5)) {
-            LOG.info("md5:"+md5);
+            LOG.info("md5:" + md5);
             throw new SeckillExpection("secKill data rewrite"); //秒杀数据被重写
         }
         try {
@@ -113,15 +121,15 @@ public class SeckillServiceImpl implements SeckillService {
                 } else {
                     // 秒杀成功 得到成功插入的数据 并返回成功秒杀的对象信息
                     SuccessKilled successKilled = successKilledDao.queryByIdWithSeckill(seckillId, userPhone);
-                    LOG.debug("successKilled={}",successKilled);
+                    LOG.debug("successKilled={}", successKilled);
                     return new SeckillExecution(seckillId, SeckillStateEnum.SUCCESS, successKilled);
                 }
             }
-        } catch (SeckillCloseExpection | RepeatSeckillExpection e1){
-            throw  e1;
+        } catch (SeckillCloseExpection | RepeatSeckillExpection e1) {
+            throw e1;
         } catch (Exception e) {
-            LOG.error(e.getMessage(),e);
-            throw new SeckillExpection("secKill inner error:"+e.getMessage());
+            LOG.error(e.getMessage(), e);
+            throw new SeckillExpection("secKill inner error:" + e.getMessage());
         }
     }
 }
