@@ -46,12 +46,13 @@
             <version>0.9.5.2</version>
         </dependency>
 
-        <!-- DAO框架依赖以及与spring整合: mybatis -->
+        <!-- orm框架 mybatis -->
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
             <version>3.4.4</version>
         </dependency>
+        <!--mybatis与spring的整合-->
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis-spring</artifactId>
@@ -78,7 +79,7 @@
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
-        <!-- spring相关依赖 -->
+        <!-- spring相关依赖 三大核心组件 -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
@@ -100,6 +101,7 @@
             <artifactId>spring-jdbc</artifactId>
             <version>4.3.8.RELEASE</version>
         </dependency>
+        <!--事务支持-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
@@ -122,12 +124,13 @@
             <artifactId>spring-test</artifactId>
             <version>4.3.8.RELEASE</version>
         </dependency>
-        <!--redis-->
+        <!--redis依赖-->
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>2.9.0</version>
         </dependency>
+        <!--高性能序列化-->
         <dependency>
             <groupId>com.dyuproject.protostuff</groupId>
             <artifactId>protostuff-core</artifactId>
